@@ -10,7 +10,7 @@ export default class Solver {
     {
         this.id = id;
 
-        const CMD = buildCommand(dataPath, modelPath, solver, statistisk, freeSearch);
+        const CMD = this.#buildCommand(dataPath, modelPath, solver, statistisk, freeSearch);
         this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
@@ -31,16 +31,17 @@ export default class Solver {
         const addFlag = (bool, flag) => {
             if(bool)
             {
-                cmd += " -" + flag;
+                cmd += ` -${flag}`;
             }
         }
-        let cmd = `minizinc ${dataPath} ${modelPath} -a`;
+        let cmd = `minizinc ${dataPath} ${modelPath}`;
 
         if(solver)
         {
             cmd += ` --solver ${solver}`;
         }
 
+        addFlag(true, "a");
         addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 

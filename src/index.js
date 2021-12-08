@@ -55,6 +55,11 @@ export async function stopSolve(msg, publish){
 
     solver.stop();
     solver = false;
+    
+    publish("solver-pong-response", {
+        solverID,
+        busy: !!solver,
+    });
 }
 
 export async function pong(msg, publish){

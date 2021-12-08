@@ -65,7 +65,7 @@ export async function stopSolve(msg, publish){
     });
 }
 
-export async function pong(msg, publish){
+export async function ping(msg, publish){
     if(msg.solverID && msg.solverID !== solverID) // This isnt for this solver
     {
         return;
@@ -73,7 +73,7 @@ export async function pong(msg, publish){
     
     publish("solver-pong-response", {
         solverID,
-        busy: !!solver,
+        problemID: solver?.problemID ?? -1
     });
 }
 
@@ -82,8 +82,8 @@ if(process.env.RAPID)
     subscriber(host, [
         {river: "solver", event: "solve", work: solve},
         {river: "solver", event: "stopSolve", work: stopSolve},
-        {river: "solver", event: "solver-ping", work: stopSolve},
+        {river: "solver", event: "solver-ping", work: ping},
     ]);
 
-    setTimeout(() => pong({}, (event, data) => rapid.publish(host, event, data)), 1500); // Tell job-queue about us
+    setTimeout(() => ping({}, (event, data) => rapid.publish(host, event, data)), 1500); // Tell job-queue about us
 }

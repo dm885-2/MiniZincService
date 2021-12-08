@@ -20,7 +20,7 @@ let solver = false; // Not busy
     }
 */
 export async function solve(msg, publish){
-    if(solver) // Solver is busy
+    if(solver || msg.solverID !== solverID) // Solver is busy
     {
         return;
     }
@@ -38,12 +38,13 @@ export async function solve(msg, publish){
             }); 
         }
 
+        solver = false;
         publish("solver-response", { // Stop other solvers working on this problem
             problemID: msg.problemID,
+            solverID,
             data,
+            busy: false,
         }); 
-
-        solver = false;
     };
 }
 
@@ -55,7 +56,7 @@ export async function stopSolve(msg, publish){
 
     solver.stop();
     solver = false;
-    
+
     publish("solver-pong-response", {
         solverID,
         busy: !!solver,
@@ -77,7 +78,7 @@ export async function pong(msg, publish){
 if(process.env.RAPID)
 {
     subscriber(host, [
-        {river: "solver", event: "solve", work: solver},
+        {river: "solver", event: "solve", work: solve},
         {river: "solver", event: "stopSolve", work: stopSolve},
         {river: "solver", event: "solver-ping", work: stopSolve},
     ]);

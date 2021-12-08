@@ -1,8 +1,10 @@
+import fs from "fs";
+import uid from "uid-safe";
+
 import {host, getTokenData, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-import fs from "fs";
-
+let solverID = new uid(18);
 let solver = false; // Not busy
 
 /*
@@ -54,8 +56,21 @@ export async function stopSolve(msg, publish){
     solver = false;
 }
 
+export async function pong(msg, publish){
+    if(msg.solverID && msg.solverID !== solverID) // This isnt for this solver
+    {
+        return;
+    }
+    
+    publish("solver-pong-response", {
+        solverID,
+        busy: !!solver,
+    });
+}
+
 if(process.env.RAPID)
 {
     subscriber(host, [{river: "solver", event: "solve", work: solver}]);
     subscriber(host, [{river: "solver", event: "stopSolve", work: stopSolve}]);
+    subscriber(host, [{river: "solver", event: "solver-ping", work: stopSolve}]);
 }

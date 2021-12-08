@@ -1,4 +1,5 @@
-import {spawn} from "child_process";
+import {spawn, exec} from "child_process";
+import kill from "tree-kill";
 
 export default class Solver {
     #solver;
@@ -6,11 +7,8 @@ export default class Solver {
 
     constructor(dataPath, modelPath, statistisk = false, freeSearch = false)
     {
-        this.#solver = spawn(`minizinc ${dataPath} ${modelPath} `, {detached: true});
-                
-        this.#solver.stdout.on('data', data => this.#onData(data));
-        this.#solver.stderr.on('data', data => this.#onErr(data));
-        this.#solver.on('close', data => this.#onClosed(data));
+        this.#solver = exec(`minizinc ${dataPath} ${modelPath} -a`,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
+        this.#solver.stdout.on('data', d => this.#onData(d));
     }
 
     set onFinish(val)
@@ -21,29 +19,61 @@ export default class Solver {
         }
     }
 
+    #PARSE_DELIMTERS = {
+        "FINAL_SOLUTION": "==========",
+        "SOLUTION": "----------",
+    };
     #results = [];
     #dataHolder = "";
     #onData(data)
     {
-        console.log("Got somethgin", data.toString());
-        this.#dataHolder += data.toString();
+        this.#dataHolder += data;
+        if(this.#dataHolder.includes(this.#PARSE_DELIMTERS.SOLUTION))
+        {
+            let solutions = this.#dataHolder
+                .split(this.#PARSE_DELIMTERS.SOLUTION)
+                .filter(d => d.trim().length > 0)
+                .map(d => ({
+                    result: d.trim().split("\r\n"),
+                    optimal: false,
+                }));
 
+            if(solutions[solutions.length - 1].result[0] === this.#PARSE_DELIMTERS.FINAL_SOLUTION) // Found optimal
+            {
+                solutions.pop(); // Remove last element
+                solutions[solutions.length - 1].optimal = true;
+            }
+            this.#results = [
+                ...this.#results,
+                ...solutions,
+            ];
+        }
     }
 
-    #onErr(data)
+    #onDone(err, stdout, stderr)
     {
-        console.log("error", data.toString());
-    }
+        if(stderr || err !== null)
+        {
+            // Some error
+            console.log("Error bro", err, stderr);
+            this.#callback(false);
+        }else if(stdout)
+        {
+            this.#callback(this.#results);
+        }
 
-    #onClosed(data)
-    {
-        this.#callback();
+        this.stop();
     }
-
-    #parse
 
     stop()
     {
-        process.kill(-this.#solver.pid);
+        if(this.#solver)
+        {
+            kill(this.#solver.pid);
+        }
+
+        this.#solver = false;
+        this.#results = [];
+        this.#dataHolder = "";
     }
 }

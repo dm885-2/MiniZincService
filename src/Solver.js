@@ -69,7 +69,7 @@ export default class Solver {
 
             if(solutions[solutions.length - 1].result[0] === this.#PARSE_DELIMTERS.FINAL_SOLUTION) // Found optimal
             {
-                solutions.pop(); // Remove last element
+                solutions.pop(); // Remove solution line
                 solutions[solutions.length - 1].optimal = true;
             }
             this.#results = [

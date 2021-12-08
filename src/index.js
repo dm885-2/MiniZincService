@@ -1,5 +1,5 @@
 import {host, getTokenData, subscriber} from "./helpers.js";
-import Solver from "./Solver";
+import Solver from "./Solver.js";
 
 import fs from "fs";
 
@@ -22,7 +22,7 @@ export async function solve(msg, publish){
         return;
     }
     solver = true; // Busy while were writing to disk
-    
+
     fs.writeFileSync("model.mzn", msg.model);
     fs.writeFileSync("data.dzn", msg.data);
 

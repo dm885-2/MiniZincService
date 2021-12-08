@@ -1,5 +1,6 @@
 import fs from "fs";
 import uid from "uid-safe";
+import rapid from "@ovcina/rapidriver";
 
 import {host, getTokenData, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
@@ -70,7 +71,11 @@ export async function pong(msg, publish){
 
 if(process.env.RAPID)
 {
-    subscriber(host, [{river: "solver", event: "solve", work: solver}]);
-    subscriber(host, [{river: "solver", event: "stopSolve", work: stopSolve}]);
-    subscriber(host, [{river: "solver", event: "solver-ping", work: stopSolve}]);
+    subscriber(host, [
+        {river: "solver", event: "solve", work: solver},
+        {river: "solver", event: "stopSolve", work: stopSolve},
+        {river: "solver", event: "solver-ping", work: stopSolve},
+    ]);
+
+    setTimeout(() => pong({}, (event, data) => rapid.publish(host, event, data)), 1500); // Tell job-queue about us
 }

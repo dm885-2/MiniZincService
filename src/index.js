@@ -5,7 +5,9 @@ import rapid from "@ovcina/rapidriver";
 import {host, getTokenData, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-let solverID = new uid(18);
+let solverID = Math.random() * 500;
+uid(18).then(id => solverID = id);
+
 let solver = false; // Not busy
 
 /*

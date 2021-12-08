@@ -94,6 +94,9 @@ export default class Solver {
         this.stop();
     }
 
+    /**
+     * Stops the solver.
+     */
     stop()
     {
         if(this.#solver)

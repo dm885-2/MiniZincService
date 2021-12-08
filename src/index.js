@@ -11,7 +11,9 @@ let solver = false; // Not busy
         problemID: string,
         data: string,
         model: string,
-        solver: string,
+        solver: string|false,
+        flagS: boolean,
+        flagF: boolean,
     }
 */
 export async function solve(msg, publish){
@@ -19,8 +21,12 @@ export async function solve(msg, publish){
     {
         return;
     }
+    solver = true; // Busy while were writing to disk
+    
+    fs.writeFileSync("model.mzn", msg.model);
+    fs.writeFileSync("data.dzn", msg.data);
 
-    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", false, false, false);
+    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF);
     solver.onFinish = data => {
         if(data && data[data.length - 1].optimal) // Solver found optimal
         {
@@ -33,6 +39,8 @@ export async function solve(msg, publish){
             problemID: msg.problemID,
             data,
         }); 
+
+        solver = false;
     };
 }
 
@@ -42,7 +50,7 @@ export async function stopSolve(msg, publish){
         return;
     }
 
-    process.kill(-solver);
+    solver.stop();
     solver = false;
 }
 

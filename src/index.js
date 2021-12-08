@@ -2,7 +2,7 @@ import fs from "fs";
 import uid from "uid-safe";
 import rapid from "@ovcina/rapidriver";
 
-import {host, getTokenData, subscriber} from "./helpers.js";
+import {host, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
 let solverID = Math.random() * 500;

@@ -4,9 +4,11 @@ import kill from "tree-kill";
 export default class Solver {
     #solver;
     #callback = () => {};
+    id;
 
-    constructor(dataPath, modelPath, statistisk = false, freeSearch = false)
+    constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false)
     {
+        this.id = id;
         this.#solver = exec(`minizinc ${dataPath} ${modelPath} -a`,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }

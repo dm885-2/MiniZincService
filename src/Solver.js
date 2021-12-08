@@ -9,7 +9,9 @@ export default class Solver {
     constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false)
     {
         this.id = id;
-        this.#solver = exec(`minizinc ${dataPath} ${modelPath} -a`,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
+
+        const CMD = buildCommand(dataPath, modelPath, solver, statistisk, freeSearch);
+        this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
 
@@ -19,6 +21,30 @@ export default class Solver {
         {
             this.#callback = val;
         }
+    }
+
+    /**
+     * Builds the MiniZinc CLI command.
+     */
+    #buildCommand(dataPath, modelPath, solver, statistisk, freeSearch)
+    {
+        const addFlag = (bool, flag) => {
+            if(bool)
+            {
+                cmd += " -" + flag;
+            }
+        }
+        let cmd = `minizinc ${dataPath} ${modelPath} -a`;
+
+        if(solver)
+        {
+            cmd += ` --solver ${solver}`;
+        }
+
+        addFlag(statistisk, "s");
+        addFlag(freeSearch, "f");
+
+        return cmd;
     }
 
     #PARSE_DELIMTERS = {

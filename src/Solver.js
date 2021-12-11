@@ -26,7 +26,8 @@ export default class Solver {
     /**
      * Builds the MiniZinc CLI command.
      */
-    #buildCommand(dataPath, modelPath, solver, statistisk, freeSearch)
+    #DOCKER_DIR = "/sharedData/";
+    #buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, dockerImage = "minizinc/minizinc")
     {
         const addFlag = (bool, flag) => {
             if(bool)
@@ -34,7 +35,7 @@ export default class Solver {
                 cmd += ` -${flag}`;
             }
         }
-        let cmd = `minizinc ${dataPath} ${modelPath}`;
+        let cmd = `minizinc ${this.#DOCKER_DIR}${dataPath} ${this.#DOCKER_DIR}${modelPath}`;
 
         if(solver)
         {
@@ -45,7 +46,7 @@ export default class Solver {
         addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 
-        return cmd;
+        return `docker run -v ${process.cwd()}/shared/:${this.#DOCKER_DIR} ${dockerImage} /bin/bash -c "${cmd}"`;
     }
 
     #PARSE_DELIMTERS = {
@@ -56,6 +57,7 @@ export default class Solver {
     #dataHolder = "";
     #onData(data)
     {
+        console.log("Got data", data);
         this.#dataHolder += data;
         if(this.#dataHolder.includes(this.#PARSE_DELIMTERS.SOLUTION))
         {

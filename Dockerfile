@@ -1,4 +1,6 @@
-FROM minizinc/minizinc
+# FROM silberjan/dind-node:latest
+FROM docker:dind
+# FROM gitlab/dind
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -9,10 +11,10 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 #install node 16
-RUN apt update
-RUN apt install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt install -y nodejs
+RUN apk update
+# RUN apk add --update nodejs=16.13.1-r0
+RUN apk add nodejs-current
+RUN apk add npm
 
 # If you are building your code for production
 RUN npm ci --only=production

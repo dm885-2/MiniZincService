@@ -1,4 +1,6 @@
-FROM minizinc/minizinc
+# FROM minizinc/minizinc
+#Docker inside Docker
+FROM docker:dind
 
 # Create app directory
 WORKDIR /usr/src/app

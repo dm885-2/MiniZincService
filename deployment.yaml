@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: <service-name>                # CHANGE THIS TO YOUR SERVICE NAME
+  name: minisolver                # CHANGE THIS TO YOUR SERVICE NAME
   labels:
-    app: <service-name>               # CHANGE THIS TO YOUR SERVICE NAME
+    app: minisolver               # CHANGE THIS TO YOUR SERVICE NAME
 spec:
   selector:
     matchLabels:
-      app: <service-name>             # CHANGE THIS TO YOUR SERVICE NAME
+      app: minisolver             # CHANGE THIS TO YOUR SERVICE NAME
   replicas: 1
   template:
     metadata:
       labels:
-        app: <service-name>           # CHANGE THIS TO YOUR SERVICE NAME
+        app: minisolver           # CHANGE THIS TO YOUR SERVICE NAME
     spec:
       containers:
-      - name: <service-name>          # CHANGE THIS TO YOUR SERVICE NAME
-        image: dm885/<image>          # CHANGE THIS TO YOUR DOCKER IMAGE
+      - name: minisolver          # CHANGE THIS TO YOUR SERVICE NAME
+        image: dm885/minisolver          # CHANGE THIS TO YOUR DOCKER IMAGE
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -25,14 +25,14 @@ spec:
           value: "mysql.default.svc.cluster.local"
         - name: mysqlUser
           value: "root"
-        - name: mysql
+        - name: mysqlPass
           valueFrom:
             secretKeyRef:
               name: mysql-secrets
               key: mysql-root-password
-        - name: mysqlDb:
+        - name: mysqlDb
           value: "db"
-        - name: rabbitUrl
+        - name: rabbitHost
           value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
         - name: rabbitPort
           value: "5672"
@@ -50,13 +50,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: <service-name>              # CHANGE THIS TO YOUR SERVICE NAME
+  name: minisolver              # CHANGE THIS TO YOUR SERVICE NAME
   labels:
-    app: <service-name>             # CHANGE THIS TO YOUR SERVICE NAME
+    app: minisolver             # CHANGE THIS TO YOUR SERVICE NAME
 spec:
   type: ClusterIP
   selector:
-    app: <service-name>             # CHANGE THIS TO YOUR SERVICE NAME
+    app: minisolver             # CHANGE THIS TO YOUR SERVICE NAME
   ports:
     - protocol: TCP
       name: http

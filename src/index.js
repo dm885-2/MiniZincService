@@ -32,6 +32,11 @@ export async function solve(msg, publish){
     fs.writeFileSync("data.dzn", msg.data);
 
     solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF);
+    
+    publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
+        solverID,
+        problemID: msg.problemID
+    }); 
     solver.onFinish = data => {
         if(data && data[data.length - 1].optimal) // Solver found optimal
         {

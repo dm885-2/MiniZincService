@@ -61,15 +61,20 @@ export async function stopSolve(msg, publish){
 
     publish("solver-pong-response", {
         solverID,
-        busy: !!solver,
+        problemID: solver?.problemID ?? -1
     });
 }
 
 export async function ping(msg, publish){
+    console.log("Got ping!", msg);
     if(msg.solverID && msg.solverID !== solverID) // This isnt for this solver
     {
         return;
     }
+    console.log("Send answer!", "solver-pong-response", {
+        solverID,
+        problemID: solver?.problemID ?? -1
+    });
     
     publish("solver-pong-response", {
         solverID,

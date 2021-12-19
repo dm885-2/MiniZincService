@@ -24,6 +24,15 @@ let solver = false; // Not busy
 export async function solve(msg, publish){
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
+        if(msg.solverID === solverID && solver) // Its already busy
+        {
+            publish("solver-response", {
+                problemID: msg.problemID,
+                solverID,
+                data: [],
+                busy: false,
+            });
+        }
         return;
     }
     solver = true; // Busy while were writing to disk
@@ -46,7 +55,7 @@ export async function solve(msg, publish){
         }
 
         solver = false;
-        publish("solver-response", { // Stop other solvers working on this problem
+        publish("solver-response", { 
             problemID: msg.problemID,
             solverID,
             data,

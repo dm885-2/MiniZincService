@@ -46,6 +46,7 @@ export default class Solver {
         addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 
+        console.log("RUn command", `docker pull --quiet ${dockerImage} && docker run --rm -v ${process.cwd()}/shared/:${this.#DOCKER_DIR} ${dockerImage} /bin/bash -c "${cmd}"`);
         return `docker pull --quiet ${dockerImage} && docker run --rm -v ${process.cwd()}/shared/:${this.#DOCKER_DIR} ${dockerImage} /bin/bash -c "${cmd}"`;
     }
 

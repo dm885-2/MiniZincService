@@ -106,5 +106,9 @@ if(process.env.RAPID)
         {river: "solver", event: "solver-ping", work: ping},
     ]);
 
-    setTimeout(() => ping({}, (event, data) => rapid.publish(host, event, data)), 1500); // Tell job-queue about us
+    setTimeout(() => rapid.publish(host, "solver-pong-response", {
+        solverID,
+        problemID: solver?.problemID ?? -1,
+        respond: true,
+    }), 1500); // Tell job-queue about us
 }

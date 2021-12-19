@@ -6,11 +6,11 @@ export default class Solver {
     #callback = () => {};
     id;
 
-    constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false, cpus = false, memory = false)
+    constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false, cpus = false, memory = false, dockerImage)
     {
         this.id = id;
 
-        const CMD = this.#buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory);
+        const CMD = this.#buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory, dockerImage);
         this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }

@@ -10,6 +10,8 @@ uid(18).then(id => solverID = id);
 
 let solver = false; // Not busy
 
+// TODO: Add job queue,
+
 /*
     Expected input:
     {

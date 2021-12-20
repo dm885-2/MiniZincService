@@ -57,7 +57,7 @@ export async function solve(msg, publish){
             problemID: msg.problemID,
             solverID,
             data,
-            busy: false,
+            busy: queue.length > 0,
         }); 
 
         if(queue.length > 0)

@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: minisolver             # CHANGE THIS TO YOUR SERVICE NAME
-  replicas: 1
+  replicas: 5
   template:
     metadata:
       labels:

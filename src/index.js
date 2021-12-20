@@ -8,6 +8,7 @@ import Solver from "./Solver.js";
 let solverID = Math.random() * 500;
 uid(18).then(id => solverID = id);
 
+let queue = [];
 let solver = false; // Not busy
 
 // TODO: Add job queue,
@@ -26,14 +27,9 @@ let solver = false; // Not busy
 export async function solve(msg, publish){
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
-        if(msg.solverID === solverID && solver) // Its already busy
+        if(msg.solverID === solverID && solver) // Its already busy, but the task has been assigned to it.
         {
-            publish("solver-response", {
-                problemID: msg.problemID,
-                solverID,
-                data: [],
-                busy: false,
-            });
+            queue.push(msg);
         }
         return;
     }
@@ -63,6 +59,11 @@ export async function solve(msg, publish){
             data,
             busy: false,
         }); 
+
+        if(queue.length > 0)
+        {
+            solve(queue.shift(), publish);
+        }
     };
 }
 

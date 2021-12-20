@@ -25,6 +25,7 @@ let solver = false; // Not busy
     }
 */
 export async function solve(msg, publish){
+    console.log("SOlve!", msg);
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
         if(msg.solverID === solverID && solver) // Its already busy, but the task has been assigned to it.

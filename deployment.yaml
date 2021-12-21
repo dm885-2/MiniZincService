@@ -4,13 +4,13 @@ metadata:
   name: minisolver
 spec:
   containers:
-  - name: minisolver
+  - name: minisolver1
     image: dm885/minisolver
     imagePullPolicy: Always
     ports:
     - containerPort: 3000
     env:
-    - name: mysqlHost1
+    - name: mysqlHost
       value: "mysql.default.svc.cluster.local"
     - name: mysqlUser
       value: "root"
@@ -38,13 +38,14 @@ spec:
     securityContext:
       allowPrivilegeEscalation: true
       privileged: true
+  containers:
   - name: minisolver2
     image: dm885/minisolver
     imagePullPolicy: Always
     ports:
     - containerPort: 3000
     env:
-    - name: mysqlHost 
+    - name: mysqlHost
       value: "mysql.default.svc.cluster.local"
     - name: mysqlUser
       value: "root"
@@ -72,13 +73,14 @@ spec:
     securityContext:
       allowPrivilegeEscalation: true
       privileged: true
+  containers:
   - name: minisolver3
     image: dm885/minisolver
     imagePullPolicy: Always
     ports:
     - containerPort: 3000
     env:
-    - name: mysqlHost 
+    - name: mysqlHost
       value: "mysql.default.svc.cluster.local"
     - name: mysqlUser
       value: "root"
@@ -106,3 +108,4 @@ spec:
     securityContext:
       allowPrivilegeEscalation: true
       privileged: true
+  

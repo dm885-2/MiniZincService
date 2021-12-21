@@ -168,17 +168,10 @@ jobs:
     - name: Deploy to GKE Cluster
       continue-on-error: true
       run: |
-         kubectl delete pod/${{env.DEPLOYMENT_NAME}}-1 && cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-1/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-#         kubectl delete pod/${{env.DEPLOYMENT_NAME}}-2 && cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-2/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-#         kubectl delete pod/${{env.DEPLOYMENT_NAME}}-3 && cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-3/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-#         kubectl delete pod/${{env.DEPLOYMENT_NAME}}-4 && cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-4/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
+         kubectl -n ${{ env.NAMESPACE }} delete pod/${{env.DEPLOYMENT_NAME}} && kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
     - name: Deploy if no pods already exists
       run: |
-        cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-1/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-#        cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-2/g" | kubectl -n ${{ env.NAMESPACE }} apply -f - 
-#        cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-3/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-#        cat ./deployment.yaml | sed "s/name: ${{env.DEPLOYMENT_NAME}}/name: ${{env.DEPLOYMENT_NAME}}-4/g" | kubectl -n ${{ env.NAMESPACE }} apply -f -
-        
+        kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
       
 #kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} restart pod/${{ env.DEPLOYMENT_NAME }}
       

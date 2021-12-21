@@ -5,7 +5,10 @@ import rapid from "@ovcina/rapidriver";
 import {host, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-let solverID = process.env?.riverId ?? (await uid(18));
+let solverID = undefined;
+async function setSolverId() {
+    solverID = process.env?.riverId ?? (await uid(18));
+}
 
 let queue = [];
 let solver = false; // Not busy
@@ -24,7 +27,9 @@ let solver = false; // Not busy
     }
 */
 export async function solve(msg, publish){
-    console.log("Solve!", msg);
+    if (solverID === undefined) {
+        await setSolverId();
+    }
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
         if(msg.solverID === solverID && solver) // Its already busy, but the task has been assigned to it.
@@ -43,34 +48,36 @@ export async function solve(msg, publish){
         {
             publish("stopSolve", { // Stop other solvers working on this problem
                 problemID: msg.problemID
-            }); 
+            });
         }
         solver = false;
-        publish("solver-response", { 
+        publish("solver-response", {
             problemID: msg.problemID,
             solverID,
             data,
             busy: queue.length > 0,
-        }); 
+        });
 
         if(queue.length > 0)
         {
             solve(queue.shift(), publish);
         }
     });
-    
+
     publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
         solverID,
         problemID: msg.problemID
-    }); 
+    });
 }
 
 export async function stopSolve(msg, publish){
+    if (solverID === undefined) {
+        await setSolverId();
+    }
     if(!solver || solver.id !== msg.problemID) // This isnt for this solver
     {
         return;
     }
-    console.log("Should terminate current solver!");
 
     solver.stop();
     solver = false;
@@ -82,11 +89,14 @@ export async function stopSolve(msg, publish){
 }
 
 export async function ping(msg, publish){
+    if (solverID === undefined) {
+        await setSolverId();
+    }
     if(msg.solverID && msg.solverID !== solverID) // This isnt for this solver
     {
         return;
     }
-    
+
     publish("solver-pong-response", {
         solverID,
         problemID: solver?.problemID ?? -1
@@ -101,9 +111,14 @@ if(process.env.RAPID)
         {river: "solver-" + solverID, event: "solver-ping", work: ping},
     ]);
 
-    setTimeout(() => rapid.publish(host, "solver-pong-response", {
+    setTimeout(async () => {
+      if (solverID === undefined) {
+        await setSolverId();
+      }
+      rapid.publish(host, "solver-pong-response", {
         solverID,
         problemID: solver?.problemID ?? -1,
         respond: true,
-    }), 1500); // Tell job-queue about us
+      })
+    }, 1500); // Tell job-queue about us
 }

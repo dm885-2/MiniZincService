@@ -76,3 +76,76 @@ spec:
     securityContext:
       allowPrivilegeEscalation: true
       privileged: true
+  - name: minisolver3
+    image: dm885/minisolver
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 3000
+    env:
+    - name: mysqlHost 
+      value: "mysql.default.svc.cluster.local"
+    - name: mysqlUser
+      value: "root"
+    - name: mysqlPass
+      valueFrom:
+        secretKeyRef:
+          name: mysql-secrets
+          key: mysql-root-password
+    - name: mysqlDb
+      value: "db"
+    - name: riverId
+      value: "solver3"
+    - name: rabbitHost
+      value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
+    - name: rabbitPort
+      value: "5672"
+    - name: rabbitUser
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq-secrets
+          key: RABBIT_USERNAME
+    - name: rabbitPass
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq-secrets
+          key: RABBIT_PASSWORD
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+  - name: minisolver4
+    image: dm885/minisolver
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 3000
+    env:
+    - name: mysqlHost 
+      value: "mysql.default.svc.cluster.local"
+    - name: mysqlUser
+      value: "root"
+    - name: mysqlPass
+      valueFrom:
+        secretKeyRef:
+          name: mysql-secrets
+          key: mysql-root-password
+    - name: mysqlDb
+      value: "db"
+    - name: riverId
+      value: "solver4"
+    - name: rabbitHost
+      value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
+    - name: rabbitPort
+      value: "5672"
+    - name: rabbitUser
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq-secrets
+          key: RABBIT_USERNAME
+    - name: rabbitPass
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq-secrets
+          key: RABBIT_PASSWORD
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+    

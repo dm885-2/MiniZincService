@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules TESTING=1 npx jest",
+    "test": "cross-env TESTING=1 npx jest",
     "start": "cross-env RAPID=1 node src/index.js",
     "debug": "cross-env RAPID=1 nodemon src/index.js",
     "debugDocker": "cross-env RAPID=1 mysqlHost=localhost mysqlPass=password mysqlDb=dm885 mysqlUser=root nodemon src/index.js"
@@ -29,6 +29,10 @@
     "uid-safe": "^2.1.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@jest/globals": "^27.3.1",
+    "babel-jest": "^27.3.1",
     "cypress": "^9.1.0",
     "jest": "^27.3.1",
     "nodemon": "^2.0.14"

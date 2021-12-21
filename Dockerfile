@@ -1,27 +1,18 @@
-# FROM silberjan/dind-node:latest
-# FROM docker:dind
-# FROM gitlab/dind
-FROM node:16
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+FROM sejkom/dind
 
 #install node 16
-# RUN apk update
-# # RUN apk add --update nodejs=16.13.1-r0
-# RUN apk add nodejs-current
-# RUN apk add npm
+RUN apt update
+RUN apt install -y curl
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt install -y nodejs
 
-# If you are building your code for production
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
 RUN npm ci --only=production
 
-# Bundle app source
 COPY . .
 
-EXPOSE 8080
-CMD ["npm", "run", "start"]
+# CMD ["npm", "run", "start"]
+ENTRYPOINT ["bash","/usr/src/app/start-everything.sh"]

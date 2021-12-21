@@ -5,8 +5,7 @@ import rapid from "@ovcina/rapidriver";
 import {host, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-let solverID = Math.random() * 500;
-uid(18).then(id => solverID = id);
+let solverID = await uid(18);
 
 let queue = [];
 let solver = false; // Not busy
@@ -99,9 +98,9 @@ export async function ping(msg, publish){
 if(process.env.RAPID)
 {
     subscriber(host, [
-        {river: "solver", event: "solve", work: solve},
-        {river: "solver", event: "stopSolve", work: stopSolve},
-        {river: "solver", event: "solver-ping", work: ping},
+        {river: "solver-" + solverID, event: "solve", work: solve},
+        {river: "solver-" + solverID, event: "stopSolve", work: stopSolve},
+        {river: "solver-" + solverID, event: "solver-ping", work: ping},
     ]);
 
     setTimeout(() => rapid.publish(host, "solver-pong-response", {

@@ -35,6 +35,9 @@ spec:
         secretKeyRef:
           name: rabbitmq-secrets
           key: RABBIT_PASSWORD
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
   - name: minisolver2
     image: dm885/minisolver
     imagePullPolicy: Always
@@ -66,6 +69,9 @@ spec:
         secretKeyRef:
           name: rabbitmq-secrets
           key: RABBIT_PASSWORD
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
   - name: minisolver3
     image: dm885/minisolver
     imagePullPolicy: Always

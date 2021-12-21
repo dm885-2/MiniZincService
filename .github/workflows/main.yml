@@ -168,10 +168,10 @@ jobs:
     - name: Deploy to GKE Cluster
       continue-on-error: true
       run: |
-         kubectl -n ${{ env.NAMESPACE }} delete pod/${{env.DEPLOYMENT_NAME}} && kubectl -n ${{ env.NAMESPACE }} apply -f -
+         kubectl -n ${{ env.NAMESPACE }} delete pod/${{env.DEPLOYMENT_NAME}} && kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
     - name: Deploy if no pods already exists
       run: |
-        kubectl -n ${{ env.NAMESPACE }} apply -f -
+        kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
       
 #kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} restart pod/${{ env.DEPLOYMENT_NAME }}
       

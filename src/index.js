@@ -7,7 +7,7 @@ import Solver from "./Solver.js";
 
 let solverID = undefined;
 async function setSolverId() {
-    solverID = await uid(18);
+    solverID = process.env?.riverId ?? (await uid(18));
 }
 
 let queue = [];
@@ -43,20 +43,13 @@ export async function solve(msg, publish){
     fs.writeFileSync("model.mzn", msg.model);
     fs.writeFileSync("data.dzn", msg.data);
 
-    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF, msg.cpuLimit, msg.memoryLimit, msg.timeLimit, msg.dockerImage);
-
-    publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
-        solverID,
-        problemID: msg.problemID
-    });
-    solver.onFinish = data => {
+    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF, msg.cpuLimit, msg.memoryLimit, msg.timeLimit, msg.dockerImage, data => {
         if(data && data[data.length - 1].optimal) // Solver found optimal
         {
             publish("stopSolve", { // Stop other solvers working on this problem
                 problemID: msg.problemID
             });
         }
-
         solver = false;
         publish("solver-response", {
             problemID: msg.problemID,
@@ -69,7 +62,12 @@ export async function solve(msg, publish){
         {
             solve(queue.shift(), publish);
         }
-    };
+    });
+
+    publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
+        solverID,
+        problemID: msg.problemID
+    });
 }
 
 export async function stopSolve(msg, publish){
@@ -108,9 +106,9 @@ export async function ping(msg, publish){
 if(process.env.RAPID)
 {
     subscriber(host, [
-        {river: "solver", event: "solve", work: solve},
-        {river: "solver", event: "stopSolve", work: stopSolve},
-        {river: "solver", event: "solver-ping", work: ping},
+        {river: "solver-" + solverID, event: "solve", work: solve},
+        {river: "solver-" + solverID, event: "stopSolve", work: stopSolve},
+        {river: "solver-" + solverID, event: "solver-ping", work: ping},
     ]);
 
     setTimeout(async () => {

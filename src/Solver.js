@@ -1,4 +1,4 @@
-import {spawn, exec} from "child_process";
+import child from "child_process";
 import kill from "tree-kill";
 
 export default class Solver {
@@ -6,28 +6,24 @@ export default class Solver {
     #callback = () => {};
     id;
 
-    constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage)
+    constructor(id, dataPath, modelPath, solver, allSolutions = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage, callback)
     {
         this.id = id;
+        
+        if(typeof callback === "function")
+        {
+            this.#callback = callback;
+        }
 
-        const CMD = this.#buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory, timeLimit, dockerImage);
-        this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
+        const CMD = this.#buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage);
+        this.#solver = child.exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
-
-    set onFinish(val)
-    {
-        if(typeof val === "function")
-        {
-            this.#callback = val;
-        }
-    }
-
     /**
      * Builds the MiniZinc CLI command.
      */
     #DOCKER_DIR = "/sharedData/";
-    #buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory, timeLimit, dockerImage = "minizinc/minizinc")
+    #buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage = "minizinc/minizinc")
     {
         const addFlag = (bool, flag) => {
             if(bool)
@@ -47,8 +43,9 @@ export default class Solver {
             cmd += ` --solver-time-limit ${timeLimit}`;
         }
 
-        addFlag(true, "a");
-        addFlag(statistisk, "s");
+        addFlag(allSolutions, "a");
+        // addFlag(allSolutions, "a");
+        // addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 
         let extraFlags = "";
@@ -79,7 +76,7 @@ export default class Solver {
                 .split(this.#PARSE_DELIMTERS.SOLUTION)
                 .filter(d => d.trim().length > 0)
                 .map(d => ({
-                    result: d.trim().split("\r\n"),
+                    result: d.trim().split("\n"),
                     optimal: false,
                 }));
 

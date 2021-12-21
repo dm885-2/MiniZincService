@@ -166,4 +166,13 @@ jobs:
         
      # Deploy the Docker image to the GKE BUILD cluster
     - name: Deploy to GKE Cluster
-      run: kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} rollout restart deployment/${{ env.DEPLOYMENT_NAME }}
+      continue-on-error: true
+      run: |
+         kubectl -n ${{ env.NAMESPACE }} delete pod/${{env.DEPLOYMENT_NAME}} && kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
+    - name: Deploy if no pods already exists
+      run: |
+        kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
+      
+#kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} restart pod/${{ env.DEPLOYMENT_NAME }}
+      
+      

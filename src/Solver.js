@@ -79,7 +79,7 @@ export default class Solver {
                 .split(this.#PARSE_DELIMTERS.SOLUTION)
                 .filter(d => d.trim().length > 0)
                 .map(d => ({
-                    result: d.trim().split("\\n"),
+                    result: d.trim().split("\n"),
                     optimal: false,
                 }));
 

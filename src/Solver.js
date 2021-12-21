@@ -48,6 +48,7 @@ export default class Solver {
         }
 
         addFlag(allSolutions, "a");
+        // addFlag(allSolutions, "a");
         // addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 

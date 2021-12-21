@@ -73,6 +73,7 @@ export async function stopSolve(msg, publish){
     {
         return;
     }
+    console.log("Should terminate current solver!");
 
     solver.stop();
     solver = false;

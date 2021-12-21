@@ -14,10 +14,8 @@ export default class Solver {
         {
             this.#callback = callback;
         }
-        console.log("Starting solver");
 
         const CMD = this.#buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage);
-        console.log(CMD);
         this.#solver = child.exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
@@ -72,7 +70,6 @@ export default class Solver {
     #onData(data)
     {
         this.#dataHolder += data;
-        console.log("Got some data", data);
         if(this.#dataHolder.includes(this.#PARSE_DELIMTERS.SOLUTION))
         {
             let solutions = this.#dataHolder
@@ -97,7 +94,6 @@ export default class Solver {
 
     #onDone(err, stdout, stderr)
     {
-        console.log("DOne!");
         if(stderr || err !== null)
         {
             // Some error

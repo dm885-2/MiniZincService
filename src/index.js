@@ -5,7 +5,7 @@ import rapid from "@ovcina/rapidriver";
 import {host, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-let solverID = await uid(18);
+let solverID = process.env?.riverId ?? (await uid(18));
 
 let queue = [];
 let solver = false; // Not busy
@@ -38,7 +38,6 @@ export async function solve(msg, publish){
     fs.writeFileSync("model.mzn", msg.model);
     fs.writeFileSync("data.dzn", msg.data);
 
-    console.log("FIles saved!");
     solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF, msg.cpuLimit, msg.memoryLimit, msg.timeLimit, msg.dockerImage, data => {
         if(data && data[data.length - 1].optimal) // Solver found optimal
         {
@@ -46,7 +45,6 @@ export async function solve(msg, publish){
                 problemID: msg.problemID
             }); 
         }
-        console.log("On done!");
         solver = false;
         publish("solver-response", { 
             problemID: msg.problemID,

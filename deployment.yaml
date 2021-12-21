@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: solver
+  name: minisolver
 spec:
   containers:
-  - name: solver
+  - name: minisolver
     image: dm885/minisolver
+    imagePullPolicy: Always
     ports:
     - containerPort: 3000
     env:

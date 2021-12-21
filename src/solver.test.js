@@ -1,12 +1,8 @@
-describe("A solver", () => {
-    it("should return a optimal solution", () => {
-        expect(1).toBe(1);
-    });
-});
-
 import child from "child_process";
 
 import Solver from "./Solver.js";
+
+jest.mock('tree-kill');
 
 let testOutput = `no. of banana cakes = 0
 no. of chocolate cakes = 0

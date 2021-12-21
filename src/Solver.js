@@ -1,4 +1,4 @@
-import {spawn, exec} from "child_process";
+import child from "child_process";
 import kill from "tree-kill";
 
 export default class Solver {
@@ -6,23 +6,19 @@ export default class Solver {
     #callback = () => {};
     id;
 
-    constructor(id, dataPath, modelPath, solver, allSolutions = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage)
+    constructor(id, dataPath, modelPath, solver, allSolutions = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage, callback)
     {
         this.id = id;
+        
+        if(typeof callback === "function")
+        {
+            this.#callback = callback;
+        }
 
         const CMD = this.#buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage);
-        this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
+        this.#solver = child.exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
-
-    set onFinish(val)
-    {
-        if(typeof val === "function")
-        {
-            this.#callback = val;
-        }
-    }
-
     /**
      * Builds the MiniZinc CLI command.
      */

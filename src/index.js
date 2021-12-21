@@ -25,7 +25,7 @@ let solver = false; // Not busy
     }
 */
 export async function solve(msg, publish){
-    console.log("SOlve!", msg);
+    console.log("Solve!", msg);
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
         if(msg.solverID === solverID && solver) // Its already busy, but the task has been assigned to it.
@@ -39,13 +39,7 @@ export async function solve(msg, publish){
     fs.writeFileSync("model.mzn", msg.model);
     fs.writeFileSync("data.dzn", msg.data);
 
-    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF, msg.cpuLimit, msg.memoryLimit, msg.timeLimit, msg.dockerImage);
-    
-    publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
-        solverID,
-        problemID: msg.problemID
-    }); 
-    solver.onFinish = data => {
+    solver = new Solver(msg.problemID, "model.mzn", "data.dzn", msg.solver, msg.flagS, msg.flagF, msg.cpuLimit, msg.memoryLimit, msg.timeLimit, msg.dockerImage, data => {
         if(data && data[data.length - 1].optimal) // Solver found optimal
         {
             publish("stopSolve", { // Stop other solvers working on this problem
@@ -65,7 +59,12 @@ export async function solve(msg, publish){
         {
             solve(queue.shift(), publish);
         }
-    };
+    });
+    
+    publish("solver-pong-response", { // Tell our JobQueues that this solver is busy.
+        solverID,
+        problemID: msg.problemID
+    }); 
 }
 
 export async function stopSolve(msg, publish){

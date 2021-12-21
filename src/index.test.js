@@ -1,16 +1,9 @@
-import {solve} from './index.js';
-import uid from 'uid-safe';
+import {solve, solverID} from './index.js';
 import fs from 'fs';
 
 // Mock functions.
-Math.random = jest.fn();
-// Set Math.random() = 1, so we know that solverID=500.
-Math.random.mockReturnValue(1);
-
 const publishFn = jest.fn();
 jest.mock('fs');
-jest.mock('uid-safe');
-uid.mockReturnValue(500);
 jest.mock('../src/Solver.js');
 
 
@@ -32,7 +25,7 @@ describe('A MiniZincService', () => {
 
   it('should write the model and data to files on solve.', () => {
     // Call the solve function.
-    msg.solverID = 500;
+    msg.solverID = solverID;
     solve(msg, publishFn);
 
     expect(fs.writeFileSync).toHaveBeenCalledTimes(2);

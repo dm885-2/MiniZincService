@@ -5,10 +5,7 @@ import rapid from "@ovcina/rapidriver";
 import {host, subscriber} from "./helpers.js";
 import Solver from "./Solver.js";
 
-let solverID = undefined;
-async function setSolverId() {
-    solverID = process.env?.riverId ?? (await uid(18));
-}
+export let solverID = process.env?.riverId ?? uid.sync(18);
 
 let queue = [];
 let solver = false; // Not busy
@@ -27,9 +24,6 @@ let solver = false; // Not busy
     }
 */
 export async function solve(msg, publish){
-    if (solverID === undefined) {
-        await setSolverId();
-    }
     if(solver || msg.solverID !== solverID) // Solver is busy
     {
         if(msg.solverID === solverID && solver) // Its already busy, but the task has been assigned to it.
@@ -71,9 +65,6 @@ export async function solve(msg, publish){
 }
 
 export async function stopSolve(msg, publish){
-    if (solverID === undefined) {
-        await setSolverId();
-    }
     if(!solver || solver.id !== msg.problemID) // This isnt for this solver
     {
         return;
@@ -89,9 +80,6 @@ export async function stopSolve(msg, publish){
 }
 
 export async function ping(msg, publish){
-    if (solverID === undefined) {
-        await setSolverId();
-    }
     if(msg.solverID && msg.solverID !== solverID) // This isnt for this solver
     {
         return;
@@ -112,9 +100,6 @@ if(process.env.RAPID)
     ]);
 
     setTimeout(async () => {
-      if (solverID === undefined) {
-        await setSolverId();
-      }
       rapid.publish(host, "solver-pong-response", {
         solverID,
         problemID: solver?.problemID ?? -1,

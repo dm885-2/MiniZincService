@@ -6,11 +6,11 @@ export default class Solver {
     #callback = () => {};
     id;
 
-    constructor(id, dataPath, modelPath, solver, statistisk = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage)
+    constructor(id, dataPath, modelPath, solver, allSolutions = false, freeSearch = false, cpus = false, memory = false, timeLimit = false, dockerImage)
     {
         this.id = id;
 
-        const CMD = this.#buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory, timeLimit, dockerImage);
+        const CMD = this.#buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage);
         this.#solver = exec(CMD,  {}, (err, stdout, stderr) => this.#onDone(err, stdout, stderr));
         this.#solver.stdout.on('data', d => this.#onData(d));
     }
@@ -27,7 +27,7 @@ export default class Solver {
      * Builds the MiniZinc CLI command.
      */
     #DOCKER_DIR = "/sharedData/";
-    #buildCommand(dataPath, modelPath, solver, statistisk, freeSearch, cpus, memory, timeLimit, dockerImage = "minizinc/minizinc")
+    #buildCommand(dataPath, modelPath, solver, allSolutions, freeSearch, cpus, memory, timeLimit, dockerImage = "minizinc/minizinc")
     {
         const addFlag = (bool, flag) => {
             if(bool)
@@ -47,8 +47,8 @@ export default class Solver {
             cmd += ` --solver-time-limit ${timeLimit}`;
         }
 
-        addFlag(true, "a");
-        addFlag(statistisk, "s");
+        addFlag(allSolutions, "a");
+        // addFlag(statistisk, "s");
         addFlag(freeSearch, "f");
 
         let extraFlags = "";
@@ -79,7 +79,7 @@ export default class Solver {
                 .split(this.#PARSE_DELIMTERS.SOLUTION)
                 .filter(d => d.trim().length > 0)
                 .map(d => ({
-                    result: d.trim().split("\r\n"),
+                    result: d.trim().split("\\n"),
                     optimal: false,
                 }));
 

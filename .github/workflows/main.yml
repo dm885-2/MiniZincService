@@ -10,12 +10,12 @@ on:
     branches: [ main ]
 
 env:
-  CICD_TOGGLE: false                              # Change this to true when you are ready to use the pipeline
+  CICD_TOGGLE: true                              # Change this to true when you are ready to use the pipeline
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
   GKE_CLUSTER: buildcluster
-  GKE_ZONE: europe-north1-a
+  GKE_ZONE: europe-north1
   NAMESPACE: rabbits                                              # Maybe change this, probably not though.
-  DEPLOYMENT_NAME: template                                       # Change this to match the name in the deployment.yaml
+  DEPLOYMENT_NAME: minisolver                                           # Change this to match the name in the deployment.yaml
 
 jobs:
   build:
@@ -77,7 +77,6 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 16.x
-        cache: 'npm'        
     - name: Run Setup-Script
       run: |
         chmod +x .github/k3s-setup.sh
@@ -103,8 +102,8 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
-    - name: Integration Testing
-      run: npx cypress run --headless --browser chrome
+    #- name: Integration Testing
+    #  run: npx cypress run --headless --browser chrome
 
   deploy:
     runs-on: ubuntu-latest
@@ -167,4 +166,13 @@ jobs:
         
      # Deploy the Docker image to the GKE BUILD cluster
     - name: Deploy to GKE Cluster
-      run: kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} rollout restart deployment/${{ env.DEPLOYMENT_NAME }}
+      continue-on-error: true
+      run: |
+         kubectl -n ${{ env.NAMESPACE }} delete pod/${{env.DEPLOYMENT_NAME}} && kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
+    - name: Deploy if no pods already exists
+      run: |
+        kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml
+      
+#kubectl -n ${{ env.NAMESPACE }} apply -f ./deployment.yaml && kubectl -n ${{ env.NAMESPACE }} restart pod/${{ env.DEPLOYMENT_NAME }}
+      
+      
